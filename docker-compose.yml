@@ -2,10 +2,10 @@ version: "3"
 services:
 
   nginx:
-    container_name: nginx
+#    container_name: nginx
     build:
-      context: nginx/.
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: nginx.Dockerfile
     ports:
       - 8080:8080
     restart: always
@@ -13,8 +13,8 @@ services:
 
   shinyproxy:
       build:
-        context: shinyproxy/.
-        dockerfile: Dockerfile
+        context: .
+        dockerfile: shinyproxy.Dockerfile
       depends_on:
         - nginx
       container_name: shinyproxy_server
@@ -23,7 +23,7 @@ services:
 
 networks:
   default:
-      external:
-        name: sp-net
+     external:
+      name: sp-net
 
   
