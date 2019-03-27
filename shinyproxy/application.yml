@@ -1,0 +1,94 @@
+proxy:
+  title: R. King Data Consulting
+  landing-page: /
+  heartbeat-rate: 10000
+  heartbeat-timeout: 60000
+  port: 8080
+  authentication: simple
+  admin-groups: admin
+
+  users:
+  - name: roz
+    password: password
+    groups: admin
+  - name: mew
+    password: password
+    groups: genusers
+
+
+  docker:
+    internal-networking: true
+#    container-protocol: https
+
+  specs:
+  
+  - id: rstudio
+    display-name: RStudio Server
+    description: An Instance of RStudio Server
+    container-network: sp-net
+    container-cmd: ["/usr/local/bin/start.sh", "/usr/lib/rstudio-server/bin/rserver", "--server-daemonize=0", "--auth-none=1","--auth-minimum-user-id=0", "--auth-validate-users=0", "--www-frame-origin=same"]
+    container-volumes: [ "/home/users/#{proxy.UserId}/:/home/#{proxy.UserId}" ]
+    container-image: rstudio
+    container-env:
+      DISABLE_AUTH: true
+      USER: root
+      NB_USER: "#{proxy.UserId}"
+      NB_UID: 1010
+      NB_GID: 1020
+      CHOWN_HOME: 'yes'
+      CHOWN_HOME_OPTS: -R
+    port: 8787
+    
+    
+  - id: jupyterlab
+    display-name: Jupyter Lab 
+    description: Jupyter data science environment
+    container-network: sp-net
+    container-cmd: ["start.sh", 
+      "jupyter", "lab", 
+      "--LabApp.token=''", 
+      "--LabApp.ip='0.0.0.0'",
+      "--LabApp.allow_origin='same'"]
+#    container-cmd: ["start.sh", 
+#      "jupyter", "notebook", 
+#      "--NotebookApp.token=''", 
+#      "--NotebookApp.ip='0.0.0.0'",
+#      "--NotebookApp.allow_origin='same'"]
+    container-volumes: [ "/home/users/#{proxy.UserId}:/home/#{proxy.UserId}" ]
+    container-image: jupyter  
+    container-env:
+      USER: root
+      NB_USER: '#{proxy.UserId}'
+      NB_UID: 1010
+      NB_GID: 1020
+      CHOWN_HOME: 'yes'
+      CHOWN_HOME_OPTS: -R
+    port: 8888
+  
+  
+  - id: dash_example
+    display-name: Dash mtcars
+    description: Example Dash App
+    container-cmd: ["gunicorn","-b", "0.0.0.0:8050", "app:server"]
+    container-image: example_dash
+    container-network: sp-net
+    port: 8050
+    
+  
+  - id: shiny_example
+    display-name: Shiny mtcars
+    description: Example Shiny App
+    container-cmd: ["R", "-e", "shiny::runApp('app.R', host='0.0.0.0', port=3838)"]
+    container-image: example_shiny
+    container-network: sp-net
+    port: 3838
+
+logging:
+  file:
+    shinyproxy.log
+  level:
+    io.undertow: WARN
+    org.springframework.web.servlet: WARN
+    com.spotify.docker: DEBUG
+    eu.openanalytics: WARN
+    root: WARN
