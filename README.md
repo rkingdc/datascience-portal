@@ -35,7 +35,9 @@ sudo mkdir /home/users/mau
 sudo chown -R docker_worker:docker_worker /home/users
 ```
 
-5. Run `docker-compose up` to start the data science portal
+5. Add users and passwords for these users in `shinyproxy/application.yml`
+
+4. Run `docker-compose up` to start the data science portal
 
 ``` sh
 docker compose up
