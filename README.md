@@ -43,3 +43,7 @@ sudo chown -R docker_worker:docker_worker /home/users
 docker compose up
 ```
 
+## Some Notes
+
+To get the terminal working in RStudio: `Tools` > `Global Options` > `Terminal` and uncheck `Connect with Websockets`
+
